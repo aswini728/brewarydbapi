@@ -1,0 +1,77 @@
+#%RAML 1.0
+title: brewarydbsapi
+version: v1
+baseUri: 
+
+/brewary:
+  get:
+    description: passing query params.
+    queryParameters:
+      states:
+        type: string
+        required: false
+      cities:
+        type: string
+        required: false
+      source:
+        type: string
+        required: false
+      state:
+        type: string
+        required: false
+      city:
+        type: string
+        required: false
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              {
+              "status":"200 OK",
+              "message":"success"
+              } 
+      400:
+        body:
+          application/json:
+            example:
+              {
+              "status":"400",
+              "message":"Bad-Request"
+              }
+      500:
+        body:
+          application/json:
+            example:
+              {
+              "status":"500",
+              "message":"Un-Authorized"
+              }  
+  post:
+    body:
+      application/json:
+        example: !include examples/inputdata.json
+    responses:
+      201:
+        body:
+          application/json:
+            example:            {
+                "status":"201 ok",
+                "message":"success"
+              }
+
+  /{id}:
+    delete:
+      queryParameters:
+        id:
+          type: integer
+          required: false
+
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                {
+                  "status":"Record deleted successfully"
+                }  

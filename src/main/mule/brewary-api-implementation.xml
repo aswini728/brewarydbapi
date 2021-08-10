@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="68fd5157-6506-439a-be67-ee5a934b5afb" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="Aswini08@" database="aswini" />
+	</db:config>
+	<flow name="post-insertdb" doc:id="c68226f6-4e43-4af3-b7ff-4b14d65b1487" >
+		<foreach doc:name="For Each" doc:id="1315b8a5-c760-4e19-bea3-5a28621cffb1" collection="#[payload]">
+			<db:insert doc:name="Insert" doc:id="10f3dc0a-50c4-4cda-a60b-954845450458" config-ref="Database_Config">
+				<db:sql><![CDATA[insert into Brewaries values(:id,:name, :brewery_type, :street, :address_2, :address_3, :city, :state, :county_province, :postal_code, :country, :longitude, :latitude, :phone, :website_url, :updated_at, :created_at)]]></db:sql>
+				<db:input-parameters ><![CDATA[#[payload]]]></db:input-parameters>
+			</db:insert>
+		</foreach>
+	</flow>
+	<flow name="get_brewaryFlow" doc:id="6c840c26-d53c-4d81-beae-595c2c57f29e" >
+		<db:select doc:name="Selection of data from brewaries" doc:id="d15a4030-00c2-4823-9d45-2379a4e7bcd0" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM Brewaries;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="brewary selected data payload" doc:id="e7424e01-fc88-4d3f-90c9-3897b8b843ff" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="deletdataidFlow" doc:id="6b4fb9dd-62d3-4f46-bdb2-a20228911403" >
+		<db:delete doc:name="Deleting data by using id" doc:id="a1de0bde-04e7-4a8a-aa29-289d90a0f582" config-ref="Database_Config">
+			<db:sql ><![CDATA[delete from Brewaries where id=:id;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	"id" : attributes.uriParams.id
+}]]]></db:input-parameters>
+		</db:delete>
+		<ee:transform doc:name="status sucess json" doc:id="c865acf2-fb93-4729-837a-826de9f82643" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+"status":"201 ok",
+"message":"success"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
